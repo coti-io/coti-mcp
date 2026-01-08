@@ -1,0 +1,34 @@
+{
+    "name": "@davibaue/coti-mcp",
+    "version": "0.0.18",
+    "description": "MCP server for COTI blockchain",
+    "main": "index.js",
+    "module": "./index.ts",
+    "type": "module",
+    "scripts": {
+        "dev": "npx @smithery/cli dev"
+    },
+    "keywords": [],
+    "author": "Davi Bauer",
+    "license": "MIT",
+    "homepage": "https://coti.io",
+    "dependencies": {
+        "@coti-io/coti-contracts": "^1.1.0",
+        "@coti-io/coti-ethers": "^1.0.0",
+        "@coti-io/coti-sdk-typescript": "^1.0.4",
+        "@modelcontextprotocol/sdk": "^1.12.1",
+        "@openzeppelin/contracts": "^4.9.6",
+        "solc": "^0.8.20",
+        "zod": "^3.25.46"
+    },
+    "devDependencies": {
+        "@types/node": "^22",
+        "shx": "^0.3.4",
+        "typescript": "^5.6.2",
+        "@smithery/cli": "^1.6.0",
+        "tsx": "^4.19.4"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

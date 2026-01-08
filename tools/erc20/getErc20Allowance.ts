@@ -1,0 +1,122 @@
+import { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
+import { getDefaultProvider, Wallet, Contract, ethers } from '@coti-io/coti-ethers';
+import { getNetwork } from "../shared/account.js";
+import { ERC20_ABI } from "../constants/abis.js";
+import { decryptUint } from "@coti-io/coti-sdk-typescript";
+import { z } from "zod";
+/**
+ * Tool definition for checking ERC20 token allowance on the COTI blockchain
+ */
+export const GET_ERC20_ALLOWANCE: ToolAnnotations = {
+    title: "Get ERC20 Allowance",
+    name: "get_erc20_allowance",
+    description:
+        "Check how many tokens a spender is allowed to use. " +
+        "This is used for checking the current allowance a spender has for an owner's tokens. " +
+        "Requires token contract address, owner address, and spender address as input. " +
+        "Returns the allowance amount.",
+    inputSchema: {
+        private_key: z.string().describe("Private key of the account (tracked by AI from previous operations)"),
+        aes_key: z.string().optional().describe("AES key for private transactions (tracked by AI). Required for private operations."),
+        network: z.enum(['testnet', 'mainnet']).describe("Network to use: 'testnet' or 'mainnet' (required)."),
+        token_address: z.string().describe("ERC20 token contract address on COTI blockchain"),
+        owner_address: z.string().describe("Address of the token owner"),
+        spender_address: z.string().describe("Address of the spender to check allowance for"),
+    },
+};
+
+/**
+ * Type guard for validating get ERC20 allowance arguments
+ * @param args - Arguments to validate
+ * @returns True if arguments are valid for get ERC20 allowance operation
+ */
+export function isGetERC20AllowanceArgs(args: unknown): args is { token_address: string, owner_address: string, spender_address: string , private_key?: string, aes_key?: string, network: 'testnet' | 'mainnet' } {
+    return (
+        typeof args === "object" &&
+        args !== null &&
+        "token_address" in args &&
+        typeof (args as { token_address: string }).token_address === "string" &&
+        "owner_address" in args &&
+        typeof (args as { owner_address: string }).owner_address === "string" &&
+        "spender_address" in args &&
+        typeof (args as { spender_address: string }).spender_address === "string"
+    );
+}
+
+/**
+ * Handler for the getERC20Allowance tool
+ * @param args The arguments for the tool
+ * @returns The tool response
+ */
+export async function getERC20AllowanceHandler(args: any): Promise<any> {
+    if (!isGetERC20AllowanceArgs(args)) {
+        throw new Error("Invalid arguments for get_erc20_allowance");
+    }
+    const { token_address, owner_address, spender_address, network, private_key, aes_key } = args;
+
+    if (!private_key || !aes_key) {
+        throw new Error("private_key and aes_key are required");
+    }
+
+    const results = await performGetERC20Allowance(private_key, aes_key, token_address, owner_address, spender_address, network);
+    return {
+        structuredContent: {
+            tokenSymbol: results.tokenSymbol,
+            decimals: results.decimals,
+            ownerAddress: results.ownerAddress,
+            spenderAddress: results.spenderAddress,
+            allowance: results.allowance,
+            tokenAddress: results.tokenAddress
+        },
+        content: [{ type: "text", text: results.formattedText }],
+        isError: false,
+    };
+}
+
+/**
+ * Retrieves the allowance for an ERC20 token spender on the COTI blockchain
+ * @param token_address - Address of the ERC20 token contract
+ * @param owner_address - Address of the token owner
+ * @param spender_address - Address of the spender to check allowance for
+ * @returns An object with allowance details and formatted text
+ */
+export async function performGetERC20Allowance(private_key: string, aes_key: string, token_address: string, owner_address: string, spender_address: string, network: 'testnet' | 'mainnet'): Promise<{
+    tokenSymbol: string,
+    decimals: number,
+    ownerAddress: string,
+    spenderAddress: string,
+    allowance: string,
+    tokenAddress: string,
+    formattedText: string
+}> {
+    try {
+        const provider = getDefaultProvider(getNetwork(network));
+        const wallet = new Wallet(private_key, provider);
+        
+        wallet.setAesKey(aes_key);
+
+        const tokenContract = new Contract(token_address, ERC20_ABI, wallet);
+        
+        const symbolResult = await tokenContract.symbol();
+        const decimalsResult = await tokenContract.decimals();
+        
+        const allowanceResult = await tokenContract.allowance(owner_address, spender_address);
+        const decryptedAllowance = decryptUint(allowanceResult, aes_key);
+        const formattedAllowance = decryptedAllowance ? ethers.formatUnits(decryptedAllowance, decimalsResult) : "Unable to decrypt";
+        
+        const formattedText = `ERC20 Token Allowance:\nToken: ${symbolResult}\nOwner: ${owner_address}\nSpender: ${spender_address}\nAllowance: ${formattedAllowance}`;
+        
+        return {
+            tokenSymbol: symbolResult,
+            decimals: Number(decimalsResult),
+            ownerAddress: owner_address,
+            spenderAddress: spender_address,
+            allowance: formattedAllowance,
+            tokenAddress: token_address,    
+            formattedText
+        };
+    } catch (error) {
+        console.error('Error getting ERC20 allowance:', error);
+        throw new Error(`Failed to get ERC20 allowance: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
