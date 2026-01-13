@@ -1,6 +1,7 @@
 # <img src="https://coti.io/images/favicon.ico" height="32"> COTI MCP Server
 
 [![smithery badge](https://smithery.ai/badge/@davibauer/coti-mcp)](https://smithery.ai/server/@davibauer/coti-mcp)
+[![FAQ](https://img.shields.io/badge/docs-FAQ-blue?style=flat&logo=readme)](./FAQ.md)
 
 A Model Context Protocol (MCP) server that enables AI applications to interact with the COTI blockchain, specializing in private token operations using COTI's Multi-Party Computation (MPC) technology.
 
@@ -94,8 +95,11 @@ After connecting, use the account management tools to create accounts:
 
 ## Resources
 
-- [COTI Documentation](https://docs.coti.io)
-- [Smithery Server Page](https://smithery.ai/server/@davibauer/coti-mcp)
+| Resource | Description |
+|----------|-------------|
+| [FAQ](./FAQ.md) | Frequently asked questions & usage examples |
+| [COTI Documentation](https://docs.coti.io) | Official COTI blockchain docs |
+| [Smithery Server](https://smithery.ai/server/@davibauer/coti-mcp) | MCP server installation & details |
 
 ## License
 
