@@ -1134,8 +1134,9 @@ Try this sequence:
 |----------|-------------|
 | [COTI MCP on Smithery](https://smithery.ai/server/@davibauer/coti-mcp) | Installation & server details |
 | [COTI Documentation](https://docs.coti.io) | Official blockchain documentation |
-| [COTI Faucet](https://faucet.coti.io) | Get free testnet tokens |
-| [CotiScan](https://cotiscan.io) | Block explorer for transactions |
+| [COTI Faucet](https://docs.coti.io/coti-documentation/networks/testnet/faucet) | Get free testnet tokens |
+| [Mainnet CotiScan](https://mainnet.cotiscan.io/) | Mainnet Block explorer for transactions |
+| [Testnet CotiScan](https://testnet.cotiscan.io/) | Testnet Block explorer for transactions |
 | [MCP Protocol](https://modelcontextprotocol.io) | Learn about Model Context Protocol |
 
 ---
